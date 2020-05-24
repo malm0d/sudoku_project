@@ -25,7 +25,7 @@ sudoku_board = [
     [0, 9, 6, 3, 0, 8, 2, 1, 5],
     [0, 0, 5, 8, 0, 0, 0, 0, 6],
     [1, 4, 0, 0, 6, 0, 0, 0, 2],
-    [0, 3, 0, 0, 2, 7, 1, 0, 0]]
+    [0, 3, 0, 0, 2, 7, 1, 0, 0]]     #sample sudoku board, 0 means empty
 
 #define function that takes a board as an argument and returns a printed
 #9x9 board fashioned as a Sudoku board.
