@@ -16,7 +16,4 @@
 #Vertical lines to separate after board[row][2]; and horizontal lines to separate after board[2]
 #Vertical and horizontal lines to define the 9units x 9units Sudoku grid (81 aquares total).
 #
-print ("test")
-print ("test22")
-print ("test3")
-print ("test4")
+
