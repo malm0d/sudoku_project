@@ -17,4 +17,4 @@
 #Vertical and horizontal lines to define the 9units x 9units Sudoku grid (81 aquares total).
 #
 print ("test")
-print ("yest2")
+print ("test2")
