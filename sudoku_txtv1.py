@@ -27,6 +27,11 @@ sudoku_board = [
     [1, 4, 0, 0, 6, 0, 0, 0, 2],
     [0, 3, 0, 0, 2, 7, 1, 0, 0]]     #sample sudoku board, 0 means empty
 
+#Global Constraints:
+# One 9x9 global grid with 9 subgrids with 9 sub-subgrids (cells).
+# Numbers 1-9 for every row, every column, and every subgrid.
+# The solution to the Sudoku board must be globally correct.
+
 #define function that takes a board as an argument and returns a printed
 #9x9 board fashioned as a Sudoku board.
 def make_board(board):
@@ -45,5 +50,7 @@ def make_board(board):
         else:
             continue
 
+
+#define function that returns the postion of an empty cell.
 make_board(sudoku_board)
 
