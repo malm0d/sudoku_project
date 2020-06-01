@@ -50,7 +50,19 @@ def make_board(board):
         else:
             continue
 
+#define function that allows us to locate position of all empty cells,
+#by returning a list of coordinates of empty cells.
+def find_empty_cells(board):
+    lst = list()
+    for row in range(len(board)):
+        for column in range(len(board[row])):
+            if board[row][column] == 0:                     #an empty cell is denoted by the integer (neutral) zero.
+                empty_cell = (row, column)                  #empty_cell holds the coordinates of an empty cell, as in (x, y), in the form of a Tuple.
+                lst.append(empty_cell)                      #appends each Tuple of coordinates to the list object (lst) that was constructed in the function.
+    print (lst)
 
-#define function that returns the postion of an empty cell.
+
+
 make_board(sudoku_board)
+find_empty_cells(sudoku_board)
 
