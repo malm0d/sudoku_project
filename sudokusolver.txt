@@ -1,0 +1,42 @@
+Implementing a Sudoku Solver.
+
+To approach the challenge, we need to construct a Backtracking Algorithm.
+The Backtracking Algorithm has three parts.
+1) The Choice (Making a Choice)
+2) The Constraints of the Choice
+3) The End Goal - Filling up the Sudoku Board
+
+Global Constraints:
++ One 9x9 global grid with 9 subgrids with 9 sub-subgrids (cells)
++ Numbers 1-9 for every row, every column, and every subgrid.
++ The solution to the Sudoku board must be globally correct.
+
+Approach - 1) Making a Choice.
+We need to be aware of the choice. If the current cell already has a number in it, we should not do anything to
+the cell. But when the current cell is an empty cell, we can fill the cell with a number choice from 1 to 9.
+Every cell will have a RECURSIVE call, in a row by row manner, that:
+1) Does nothing if it already has a number in it.
+2) Places a number 1 to 9 in the cell if it is empty.
+3) Solves for every column in the row, starting from column[0] to column[length-1].
+4) When the row is complete with numbers in every empty cell, proceeds to the next row, and resets to the
+   first column of the row again (column[0]), and repeats solving for every column.
+
+Approach - 2) The Constraints of the Choice.
+Every choice of numbers must not have a conflict within the row, column, and subgrid. That is, every choice must
+be unique in the row, column, and subgrid. This is the constraint for all 81 cells in the Sudoku board.
+Before we put a number in a cell, we need to check if the choice does not have a duplicate in the row, column,
+and subgrid.
+By using a backtracking algorithm, we can be certain that for every choice we have made so far, we will not have
+conflict with any other cell in the row, column, and subgrid. We can also be certain that all cells leading to
+the current empty cell is correct and in harmony with their individual rows, columns, and subgrids. For each
+number choice we make for an empty cell, if the choice clashes with another cell in the row, column, or subgrid,
+we will increment the choice by 1, and repeat checking with the row, column, and subgrid.
+
+Approach - 3) The End Goal - Filling up the Sudoku Board.
+The last row of the board should be row[length-1]. Simply, when we are at row[length], the Sudoku Board has
+been completely filled.
+
+Other considerations:
+Sudoku boards are fixed in a 9x9 structure, so we do not need to be concerned about scaling.
+
+
