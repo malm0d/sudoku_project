@@ -59,7 +59,7 @@ def find_empty_cells(board):
             if board[row][column] == 0:                     #an empty cell is denoted by the integer (neutral) zero.
                 empty_cell = (row, column)                  #empty_cell holds the coordinates of an empty cell, as in (row, column), in the form of a Tuple.
                 return empty_cell
-            return None
+    return None
 
 
 #define function that checks if the solution to the board is globally correct.
