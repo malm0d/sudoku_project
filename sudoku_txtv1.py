@@ -54,21 +54,19 @@ def make_board(board):
 #define function that allows us to locate position of all empty cells,
 #by returning a list of coordinates of empty cells.
 def find_empty_cells(board):
-    lst = list()
     for row in range(len(board)):
         for column in range(len(board[row])):
             if board[row][column] == 0:                     #an empty cell is denoted by the integer (neutral) zero.
-                empty_cell = (row, column)                  #empty_cell holds the coordinates of an empty cell, as in (row, col), in the form of a Tuple.
-                lst.append(empty_cell)                      #appends each Tuple of coordinates to the list object (lst) that was constructed in the function.
-    print (lst)
+                empty_cell = (row, column)                  #empty_cell holds the coordinates of an empty cell, as in (row, column), in the form of a Tuple.
+                return empty_cell
+            return None
 
 
 #define function that checks if the solution to the board is globally correct.
 #This means, we need to check, for the cell that we are working on, there is harmony across the cell's row.
 #We also need to check, for the cell that we are working on,there is harmony down the cell's column.
 #And we also need to check, for the cell we are working on, there is harmony within each subgrid that the cell is a part of.
-
-def harmony(board, choice, emptycell_coord):                #choice argument is the number we want to put in an empty cell. And emptycell_coord argument is a Tuple (row, column).
+def harmony(board, choice, emptycell_coord):                                            #choice argument is the number we want to put in an empty cell. And emptycell_coord argument is a Tuple (row, column).
     #check harmony in row of empty cell::
     for x in range(len(board[0])):                                                      #board has a fixed length, so we can opt for board[0] as every row in the board will yield range(9)->[0,1,..,7,8].
         if board[emptycell_coord[0]][x] == choice and x != emptycell_coord[1]:          #access x-coord of empty cell via index notation: emptycell_coord[0] = row. The second conditional: x != emptycell_coord[1], allows the function to
@@ -93,7 +91,27 @@ def harmony(board, choice, emptycell_coord):                #choice argument is 
     return True                                                             #if the arguments do not trigger any return False, we know that the current board is valid, globally.
 
 
+#Define fucntion that solves Sudoku board - runs above 3 functions:
+def solve_sudoku(board):                                                    #returns True if board is complete, if not operates to solve the board recursively, via backtracking algorithm.
+    emptycell_location = find_empty_cells(board)                            #find_empty_cells(board) takes in a board and scans for empty cells. Returns empty cells as (row, column), and assigns Tuple to the variable emptycell_location.
+    if emptycell_location is None:                                          #find_empty_cells(board) returns None if there are no empty cells; if so, all empty cells would be occupied. 
+        return True
+    else:                                                                   #emptycell_location holds a Tuple (row, column), which is the coordinates of an empty cell.
+        (row, column) = emptycell_location                                  #Unpack and assign tuple (row, column) to variables: row = row & column = column, so we can use double index to access value of the empty cell.
+    for n in range(1, 10):                                                  #Iteration variable n will take on integers 1-9, so it inserts all possible sudoku-integers as a choice argument for every empty cell. 
+        if harmony(board, n, emptycell_location) == True:
+            board[row][column] = n                                          #If the choice argument allows harmony function to yield True, it means that the choice argument has met all constraints in
+                                                                            #the row, column and subgrid of the sudoku board. Replace the value of the empty cell with the value of the choice argument.
+                                                                            #Then we need to recursively try to solve the sudoku board again with the choice argument (n) that we just inserted into the empty cell.
+            if solve_sudoku(board) == True:                                 #By calling the solve_sudoku function again, we will look at a NEW empty cell and try to solve the board with the newly inserted choice argument
+                return True                                                 #as a dependency for the board to be valid. And if solve_sudoku(board) returns False with the newly inserted choice argument, meaning the next empty cell
+                                                                            #cannot find a solution for n = 1-9, it will reset the previous empty cell to be 0 (empty) and then try again with another value of n, for the range of n = 1-9.
+            board[row][column] = 0                                          #Note that board[row][column] = 0 refers to the location of the previous empty cell (the one we worked on before calling solve_sudoku the second time).
+                                                                            #(board[row][column] = 0 only runs when the last line of the function - 'return False' is executed).    
+    return False                                                            #If we loop though all possible sudoku-integers and none of them can return harmony() == True, solve_sudoku will return False, and that means the
+                                                                            #solution is not True. Also note, figuratively, the recursive algorithm runs a function within a function, so it has multiple layers of code running at the same time.
+
 
 make_board(sudoku_board)
-find_empty_cells(sudoku_board)
-
+solve_sudoku(sudoku_board)
+make_board(sudoku_board)
