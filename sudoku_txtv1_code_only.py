@@ -59,7 +59,7 @@ def find_empty_cells(board):
             if board[row][column] == 0:
                 empty_cell = (row, column)
                 return empty_cell
-            return None
+    return None
 
 
 #define function that checks if the solution to the board is globally correct.
