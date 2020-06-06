@@ -6,7 +6,25 @@ pygame.init()
 
 #Create classes for global grid (9x9), and single cell.
 class Global_Grid:
-    pass
+
+    sudoku_board = [                                    #adjust board manually if user wants to change the board/difficulty.
+    [5, 0, 0, 1, 8, 0, 0, 7, 0],                        #sudoku_board object represents the starting grid of filled cells.
+    [0, 0, 7, 2, 9, 0, 5, 4, 3],
+    [0, 0, 0, 0, 0, 4, 0, 0, 1],
+    [0, 5, 0, 6, 0, 0, 9, 8, 0],
+    [7, 0, 0, 9, 0, 0, 3, 0, 4],
+    [0, 9, 6, 3, 0, 8, 2, 1, 5],
+    [0, 0, 5, 8, 0, 0, 0, 0, 6],
+    [1, 4, 0, 0, 6, 0, 0, 0, 2],
+    [0, 3, 0, 0, 2, 7, 1, 0, 0]]
+
+    def __init__(self, row, column, width, height):
+        self.row = row
+        self.column = column
+        self.width = width
+        self.height = height
+        
+
 
 
 class Single_Cell:
