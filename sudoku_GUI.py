@@ -1,13 +1,13 @@
 #Construct and implement GUI for Sudoku solver, using pygame.
 import pygame
-from sudoku_txtv1 import make_board, find_empty_cells, harmony, solve_sudoku
+from sudoku_txtv1 import find_empty_cells, harmony, solve_sudoku
 import time
 pygame.init()
 
 #Create classes for global grid (9x9), and single cell.
 class Global_Grid:
 
-    sudoku_board = [                                    #adjust board manually if user wants to change the board/difficulty.
+    sudoku_board = [                                    #Adjust board manually if user wants to change the board/difficulty.
     [5, 0, 0, 1, 8, 0, 0, 7, 0],                        #sudoku_board object represents the starting grid of filled cells.
     [0, 0, 7, 2, 9, 0, 5, 4, 3],
     [0, 0, 0, 0, 0, 4, 0, 0, 1],
@@ -23,12 +23,41 @@ class Global_Grid:
         self.column = column
         self.width = width
         self.height = height
-        
+        self.selection = None
 
+    def selection(self, row, column):                       #Define a function that selects a cell.
+        for x in range(self.row):
+            for y in range(self.column):
+                ???
+
+
+    white = (255, 255, 255)
+    gray = (128, 128, 128)                                   #pygame.draw.line(surface, color, start_pos, end_pos, width) -> Rect. start_pos & end_pos receive (x, y) coordinates (as Tuples or List).
+    def draw_grid(self, main_window):                        #Draw grid lines. Major grid lines are white, minor grid lines are gray.
+        cell_width = (self.width / 9)                        #Divide width into 9 equal cells.
+        for n in range(self.column + 1):                     #There are 10 vertical and horizontal lines dividing cells equally, so self.column + 1 includes very last vertical & horizontal line to iterator: [0,1,2,3,4,5,6,7,8,9].
+            if n % 3 == 0:                                   #Apply same logic in make_board() function from sudoku_txtv1.py to modulo operations. Thicker lines are n = 0, 3, 6, 9. Thin lines are the remaining n values.
+                line_width = 3                               #Default line width = 1.  Width < 1 = nothing will be drawn.
+            else:
+                line_width = 1
+            if line_width == 3:                                                                                               #First vertical and horizontal line: cellwidth*0, last vertical and horizontal line: cellwidth*9.
+                pygame.draw.line(main_window, white, ((cell_width * n), 0), ((cell_width * n), self.height), line_width)      #Draws vertical major grid lines, starting from y = 0.
+                pygame.draw.line(main_window, white, (0, (cell_width * n)), (self.width, (cell_width * n)), line_width)      #Draws horizontal major grid lines, starting from x = 0.
+            elif line_width == 1:
+                pygame.draw.line(main_window, gray, ((cell_width * n), 0), ((cell_width * n), self.height), line_width)       #Draws vertical minor grid lines, starting from y = 0.
+                pygame.draw.line(main_window, gray, (0, (cell_width * n)), (self.width, (cell_width * n)), line_width)       #Draws horizontal minor grid lines, starting from x = 0.
 
 
 class Single_Cell:
-    pass
+    def __init__(self, value, row, column, width, height):
+        self.value = value
+        self.row = row
+        self.column = column
+        self.width = width
+        self.height = height
+
+
+
 
 
 def main_window():
