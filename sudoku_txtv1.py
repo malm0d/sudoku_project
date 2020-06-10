@@ -113,5 +113,6 @@ def solve_sudoku(board):                                                    #ret
 
 
 make_board(sudoku_board)
+print ('--------------------------------------------------------------------------')
 solve_sudoku(sudoku_board)
 make_board(sudoku_board)
