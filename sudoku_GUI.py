@@ -24,27 +24,42 @@ class Single_Cell:
     def insert_value(self, value):                                     #Method inserts a value in the selected cell.
         self.value = value
 
-    def draw_single_cell(self, screen):                                #The draw_single_cell function highlights the selected cell, and blits a number (image) onto the surface of a single cell.
+    def draw_single_cell(self, screen):                                #Method highlights the selected cell, takes its value - whether empty (0) or otherwise, and blits the number (image) onto the screen (surface).
         cell_measuremt = (self.height / 9)                             #Divide either self.width or self.height by 9 to get width or height (dimensions) of a Single_Cell instance, which is a square.         
-        cell_x = (self.column * cell_sides_measurement)                #Calculate x & y coordinates of the Single_Cell, coordinates are not indices but actual measurement values.
-        cell_y = (self.row * cell_sides_measurement)
+        cell_x = (self.column * cell_measuremt)                        #Calculate x & y coordinates of the Single_Cell, coordinates are not indices but actual measurement values.
+        cell_y = (self.row * cell_measuremt)
         gray = (128, 128, 128)
         some_blue = (0, 170, 204)
         white = (255, 255, 255)
         font = pygame.font.SysFont("Times", 32)                        #SysFont(name, size, bold=False, italic=False) -> Font. Set the Font and Font size to be used.
-        if self.selection == True:                                                                      #self.selection == True when a single cell is selected. If so draw a rectangle to higlight cell borders.
-            pygame.draw.rect(screen, some_blue, (cell_x, cell_y, cell_measuremt, cell_measuremt), 2)    #rect(surface, color, rect, width=0, border_radius=0...) -> Rect. rect=(posn:x & y and dimnsn: width & height).
-                                                                                                        #If width > 0, used for line thickness.
+        if self.selection == True:                                                                      #self.selection == True when a single cell is selected. If so draw a Rectangle surface that higlight cell borders.
+            pygame.draw.rect(screen, some_blue, (cell_x, cell_y, cell_measuremt, cell_measuremt), 4)    #rect(surface, color, rect, width=0, ... ) -> Rect. rect = (position: x & y and dimension: width & height) -> (x, y, w, h).
+                                                                                                        #If width > 0, used for line thickness. The surface parameter is the surface to draw on.
         if self.value != 0:                                                               #Draws self.value onto a single cell, of which is not an empty cell. That is, self.value is a number already present in the board. 
-            text = font.render(str(self.value), True, white)                              #render(text, antialias, color, background=None) -> Surface. Font.render() creates an image(Surface) of the text, & blits it onto another Surface. The
-            screen.blit(text, (cell_x +(cell_measuremt/2), cell_y +(cell_measuremt/2)))   #antialias argument is a boolean: if true, characters will have smooth edges. blit(source, dest, area=None, special_flags=0) -> Rect. 
+            text = font.render(str(self.value), True, white)                              #render(text, antialias, color, background=None) -> Surface. Font.render() creates an image(Surface) of the text, & blit it onto another surface (screen).
+            screen.blit(text, (cell_x +(cell_measuremt/2), cell_y +(cell_measuremt/2)))   #The antialias argument is a boolean: if true, characters will have smooth edges. blit(source, dest, area=None, special_flags=0) -> Rect. 
                                                                                     #Dest can be coordinates repping upper left corner of the source. So, add (cell_measuremt/2) to x & y to place self.value in exact middle of a single cell.
         elif self.value == 0 and self.temporary_value != 0:                             
             text = font.render(str(self.temporary_value), True, gray)                     #Draws self.temporary_value onto an empty cell (self.value == 0). So, self.temporary_value is a number that has yet to be committed to an empty cell,
             screen.blit(text, (cell_x +(cell_measuremt/2), cell_y +(cell_measuremt/2)))   #or what can be described as the number that is 'sketched' into an empty cell as the user's workings.
 
-    def 
-
+    def draw_outcome(self, screen, outcome):                            #Method draws an Aqua rectangle around the borders of a cell if the outcome of the inserted value is True, Fuchsia if False.
+        aqua = (77, 255, 255)                                           #Method will be invoked when the board is running the algorithm and is checking the worked cells for their validity. Since algorithm will be running through
+        fuchsia = (255, 0, 255)                                         #every cell that was initially empty, each cell must be filled with a Rect surface so that we can blit self.value onto the surface of each worked cell.
+        black = (0, 0, 0)                                               #Rectangle surface of all worked cells must match the background of the main screen interface, which will be black.
+        cell_measuremt = (self.height / 9)
+        cell_x = (self.column * cell_measuremt)
+        cell_y = (self.row * cell_measuremt)
+        font = pygame.font.SysFont("Times", 32)
+        pygame.draw.rect(screen, black, (cell_x, cell_y, cell_measuremt, cell_measuremt), 0)   #When width == 0, the Rectangle surface that's drawn will be filled; width > 0 is only used for line thickness; screen is the surface to draw on.
+                                                                                               #This allows program to blit a number (image) into the cell, as cell would have a Rectangle surface within its borders. 
+        text = font.render((str(self.value), True, white))                                     #Creates a surface (image) of the text (self.value), and then blit this surface onto another surface (screen).
+        screen.blit(text, (cell_x + (cell_measuremt/2), cell_y + (cell_measuremt/2)))
+        
+        if outcome == True:                                                                    #outcome == True occurs when the value inserted into the empty cell returns True when it is checked to be valid with the harmony function.
+            pygame.draw.rect(screen, aqua, (cell_x, cell_y, cell_measuremt, cell_measuremt), 4)
+        else:                                                                                     #outcome == False occurs when the above circumstance returns False when it is checked to be invalid with the harmony function.
+            pygame.draw.rect(screen, fuchsia, (cell_x, cell_y, cell_measuremt, cell_measuremt), 4)
 
 
 
