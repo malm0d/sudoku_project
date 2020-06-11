@@ -6,6 +6,7 @@ pygame.init()
 
 #Create classes for global grid, and single cell.
 
+
 class Single_Cell:
     rows = 9                                                           #Class Variables present in all SIngle_Cell instances.
     columns = 9                                                        #Class Variables will be used as arguments for parameters: rows & columns in the Global_Grid Instance.
@@ -38,7 +39,7 @@ class Single_Cell:
         if self.value != 0:                                                               #Draws self.value onto a single cell, of which is not an empty cell. That is, self.value is a number already present in the board. 
             text = font.render(str(self.value), True, white)                              #render(text, antialias, color, background=None) -> Surface. Font.render() creates an image(Surface) of the text, & blit it onto another surface (screen).
             screen.blit(text, (cell_x +(cell_measuremt/2), cell_y +(cell_measuremt/2)))   #The antialias argument is a boolean: if true, characters will have smooth edges. blit(source, dest, area=None, special_flags=0) -> Rect. 
-                                                                                    #Dest can be coordinates repping upper left corner of the source. So, add (cell_measuremt/2) to x & y to place self.value in exact middle of a single cell.
+                                                                                          #Dest can be coordinates repping upper left corner of the source. So, add (cell_measuremt/2) to x & y to place self.value in exact middle of a single cell.
         elif self.value == 0 and self.temporary_value != 0:                             
             text = font.render(str(self.temporary_value), True, gray)                     #Draws self.temporary_value onto an empty cell (self.value == 0). So, self.temporary_value is a number that has yet to be committed to an empty cell,
             screen.blit(text, (cell_x +(cell_measuremt/2), cell_y +(cell_measuremt/2)))   #or what can be described as the number that is 'sketched' into an empty cell as the user's workings.
@@ -83,27 +84,47 @@ class Global_Grid:                                                      #A Globa
         self.height = height
         self.screen = screen
         self.selection = None
-
+        self.singlecells = [Single_Cell(self.sudoku_board[row][column], row, column, width, height)     
+                            for row in range(rows) for column in range(columns)]
+                                                                                    #self.singlecells is a list of Single_Cell instances, which is a list of all the cells from the sudoku board.
     white = (255, 255, 255)
-    gray = (128, 128, 128)                                      #pygame.draw.line(surface, color, start_pos, end_pos, width) -> Rect. start_pos & end_pos receive (x, y) coordinates (as Tuples or List).
-    def draw_grid(self, screen):                                #Draw grid lines. Major grid lines are white, minor grid lines are gray.
-        cell_width = (self.width / 9)                           #Divide width into 9 equal cells.
-        for n in range(self.column + 1):                        #There are 10 vertical and horizontal lines dividing cells equally, so self.column + 1 includes very last vertical & horizontal line to iterator: [0,1,2,3,4,5,6,7,8,9].
-            if n % 3 == 0:                                      #Apply same logic in make_board() function from sudoku_txtv1.py to modulo operations. Thicker lines are n = 0, 3, 6, 9. Thin lines are the remaining n values.
-                line_width = 3                                  #Default line width = 1.  Width < 1 = nothing will be drawn.
+    gray = (128, 128, 128)                                              #pygame.draw.line(surface, color, start_pos, end_pos, width) -> Rect. start_pos & end_pos receive (x, y) coordinates (as Tuples or List).
+    def draw_grid(self, screen):                                        #Draw grid lines. Major grid lines are white, minor grid lines are gray.
+        cell_width = (self.width / 9)                                   #Divide width into 9 equal cells.
+        for n in range(self.column + 1):                                #There are 10 vertical and horizontal lines dividing cells equally, so self.column + 1 includes very last vertical & horizontal line to iterator: [0,1,2,3,4,5,6,7,8,9].
+            if n % 3 == 0:                                              #Apply same logic in make_board() function from sudoku_txtv1.py to modulo operations. Thicker lines are n = 0, 3, 6, 9. Thin lines are the remaining n values.
+                line_width = 3                                          #Default line width = 1.  Width < 1 = nothing will be drawn.
             else:
                 line_width = 1
-            if line_width == 3:                                                                                       #First vertical and horizontal line: cellwidth*0, last vertical and horizontal line: cellwidth*9.
-                pygame.draw.line(screen, white, ((cell_width * n), 0), ((cell_width * n), self.height), line_width)     #Draws vertical major grid lines, starting from y = 0.
-                pygame.draw.line(screen, white, (0, (cell_width * n)), (self.width, (cell_width * n)), line_width)      #Draws horizontal major grid lines, starting from x = 0.
+            if line_width == 3:                                                                                      #First vertical and horizontal line: cellwidth*0, last vertical and horizontal line: cellwidth*9.
+                pygame.draw.line(screen, white, ((cell_width * n), 0), ((cell_width * n), self.height), line_width)  #Draws vertical major grid lines, starting from y = 0.
+                pygame.draw.line(screen, white, (0, (cell_width * n)), (self.width, (cell_width * n)), line_width)   #Draws horizontal major grid lines, starting from x = 0.
             elif line_width == 1:
-                pygame.draw.line(screen, gray, ((cell_width * n), 0), ((cell_width * n), self.height), line_width)      #Draws vertical minor grid lines, starting from y = 0.
-                pygame.draw.line(screen, gray, (0, (cell_width * n)), (self.width, (cell_width * n)), line_width)       #Draws horizontal minor grid lines, starting from x = 0.
+                pygame.draw.line(screen, gray, ((cell_width * n), 0), ((cell_width * n), self.height), line_width)   #Draws vertical minor grid lines, starting from y = 0.
+                pygame.draw.line(screen, gray, (0, (cell_width * n)), (self.width, (cell_width * n)), line_width)    #Draws horizontal minor grid lines, starting from x = 0.
 
-    def selection(self, row, column):
-        for x in range(self.rows):                              #method assigns (row, column) coordinates to self.selection.
+    def reset_and_select(self, row, column):
+        for x in range(self.rows):                                      #Method assigns (row, column) coordinates to self.selection.
             for y in range(self.columns):
-                ???
+
+                self.singlecells[x][y].selection = False                #Reset all self.selection in self.singlecells list to False. So that when a Single_Cell instance is
+                                                                        #selected again, only this Single_Cell instance will have self.selection == True.
+        self.singlecells[row][column].selection = True                  #Then assign the coordinates of this selected Single_Cell instance to self.selection.
+        self.selection = (row, column)
+
+    def clear_cell(self):                                               #Method enables an empty and unworked cell to remain clear of any number. If self.value is 0, it means cell is empty and should not display any number including 0.
+        (row, column) = self.selection                                  #Unpack coordinates, and set self.tempory_value = 0 in order to not meet all the conditionals of the draw_single_cell method of the Single_Cell instance,
+        if self.singlecells[row][column].value == 0:                    #so that draw_single_cell method does not blit self.temporary_value = 0 onto the surface of the empty and unworked cell and it remains clear of any number.
+            self.singlecells[row][column].insert_temporary_value(0)
+
+    def sketch_cell(self, value):                                       #Method allows user to sketch a draft number into an empty cell, by giving the cell a temporary value.
+        (row, column) = self.selection
+        self.singlecells[row][column].insert_temporary_value(value)
+
+    def
+
+
+
 
 
 
@@ -111,21 +132,21 @@ def main_window():
     #Construct a visible screen interface:
     screenwidth = 800
     screenheight = 920
-    screen = pygame.display.set_mode([screenwidth, screenheight])           #set_mode(size=(0, 0), flags=0, depth=0, display=0) -> set screen size.
-    background = pygame.Surface(screen.get_size())                          #Surface((width, height), flags=0, depth=0, masks=None) -> create background surface. #get_size() -> (width, height)
-    background.fill((0, 0, 0))                                              #fill(color, rect=None, special_flags=0) -> Rect color = (r, g, b)
-    background.convert()                                                    #change the pixel format of an image; convert(Surface=None) -> Surface
-    screen.blit(background, (0,0))                                          #background surface is not visible on its own. blit background surface to the screen.
-                                                                            #blit(source, dest, area=None, special_flags=0) -> Rect. Upper left corner of 'background' is on position (0, 0) on the screen.
+    screen = pygame.display.set_mode([screenwidth, screenheight])       #set_mode(size=(0, 0), flags=0, depth=0, display=0) -> set screen size.
+    background = pygame.Surface(screen.get_size())                      #Surface((width, height), flags=0, depth=0, masks=None) -> create background surface. #get_size() -> (width, height)
+    background.fill((0, 0, 0))                                          #fill(color, rect=None, special_flags=0) -> Rect color = (r, g, b)
+    background.convert()                                                #change the pixel format of an image; convert(Surface=None) -> Surface
+    screen.blit(background, (0,0))                                      #background surface is not visible on its own. blit background surface to the screen.
+                                                                        #blit(source, dest, area=None, special_flags=0) -> Rect. Upper left corner of 'background' is on position (0, 0) on the screen.
     
-    mainloop = True                                                         #mainloop represents pygame window.
+    mainloop = True                                                     #mainloop represents pygame window.
     #construct pygame events handler:
-#    while mainloop == True:                                                 #If pygame window is still running:
-#        for event in pygame.event.get():                                    #get events from the queue, get(eventtype=None) -> Event List
-#            if event.type == pygame.QUIT:                                   #if event.type is a QUIT event, uninitialize all pygame modules, 
-#                mainloop = False                                            #pygame window closed by user.
-#            elif event.type == pygame.KEYDOWN:                              #else & if event.type is a KEYDOWN event, i.e, a key is pressed, set function of pressed keys, using pygame key constants.
-#                if event.key == pygame.K_1:                                 #every KEYDOWN event has a key and a mod. Refer to pygame.key documentation for list of constants and their representations.
+#    while mainloop == True:                                             #If pygame window is still running:
+#        for event in pygame.event.get():                                #get events from the queue, get(eventtype=None) -> Event List
+#            if event.type == pygame.QUIT:                               #if event.type is a QUIT event, uninitialize all pygame modules, 
+#                mainloop = False                                        #pygame window closed by user.
+#            elif event.type == pygame.KEYDOWN:                          #else & if event.type is a KEYDOWN event, i.e, a key is pressed, set function of pressed keys, using pygame key constants.
+#                if event.key == pygame.K_1:                             #every KEYDOWN event has a key and a mod. Refer to pygame.key documentation for list of constants and their representations.
 #                    key = 1
 #                if event.key == pygame.K_2:
 #                    key = 2
