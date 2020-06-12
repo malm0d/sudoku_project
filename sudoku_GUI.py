@@ -144,10 +144,14 @@ class Global_Grid:                                                      #A Globa
                 self.update_board()                                         #If it returns False, we cannot commit the value and cannot procced, thus we must reset the selected cell.
                 return False
 
-    def 
-
-
-
+    def user_click(self, position):                                         #The position parameter takes in (x, y) position of the mouse cursor (from pygame.mouse.get_pos()).
+        if position[0] < self.width and position[1] < self.height:          #position[0] = x, position[1] = y. Checks if the position of the cursor is within the sudoku board, if so, finds the
+            cell_width = (self.width / 9)                                   #position of the cursor relative to the rows and columns of the board (has to be integers, no floats); and then,
+            row = int (position[0] // cell_width)                           #return (row, column), which locates the cell that the cursor is clicking on.
+            column = int (position[1] // cell_width)
+            return (row, column)
+        else:                                                               #If the position of the cursor is outside the boundary of the sudoku board,
+            return None                                                     #return None since there is nothing beyond the boundary.
 
     def check_complete(self):                                           #Method checks for all combinations of rows and columns, to check that all cells have been filled.
         for row in range(self.rows):                                    #Returns False the moment an empty cell (value = 0) is encountered. Only returns True when all
@@ -155,6 +159,18 @@ class Global_Grid:                                                      #A Globa
                 if self.singlecells[row][column].value == 0:
                     return False
         return True
+
+    def solve_sudoku_GUI(self):                                         #Method is simply the solve_sudoku function, but modified to display backtracking algorithm in real time.
+        emptycell_location = find_empty_cells(self.updatedgrid)         #Refer to sudoku_txtv1 for explanation of solve_sudoku function.
+        if emptycell_location is None:
+            return True
+        else:
+            (row, column) = emptycell_location
+        for n in range(1, 10):
+            if harmony(self.updatedgrid, n, emptycell_location) == True:
+                ?
+
+
 
 
 
