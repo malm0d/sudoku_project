@@ -64,6 +64,7 @@ class Single_Cell:
 
 
 
+
 class Global_Grid:                                                      #A Global_Grid instance will hold all Single_Cell instances.
 
     sudoku_board = [                                                    #Adjust board manually if user wants to change the board/difficulty.
@@ -84,9 +85,12 @@ class Global_Grid:                                                      #A Globa
         self.height = height
         self.screen = screen
         self.selection = None
-        self.singlecells = [Single_Cell(self.sudoku_board[row][column], row, column, width, height)     
-                            for row in range(rows) for column in range(columns)]
-                                                                                    #self.singlecells is a list of Single_Cell instances, which is a list of all the cells from the sudoku board.
+        self.singlecells = [[Single_Cell(self.sudoku_board[row][column], row, column, width, height)      #self.singlecells is an array of Single_Cell instances, which is a list of all
+                            for row in range(rows)] for column in range(columns)]                         #the cells from the sudoku board. List comprehension with a nested list comprehension.
+        self.updatedgrid = None
+        self.update_board()
+
+
     white = (255, 255, 255)
     gray = (128, 128, 128)                                              #pygame.draw.line(surface, color, start_pos, end_pos, width) -> Rect. start_pos & end_pos receive (x, y) coordinates (as Tuples or List).
     def draw_grid(self, screen):                                        #Draw grid lines. Major grid lines are white, minor grid lines are gray.
@@ -107,9 +111,9 @@ class Global_Grid:                                                      #A Globa
         for x in range(self.rows):                                      #Method assigns (row, column) coordinates to self.selection.
             for y in range(self.columns):
 
-                self.singlecells[x][y].selection = False                #Reset all self.selection in self.singlecells list to False. So that when a Single_Cell instance is
-                                                                        #selected again, only this Single_Cell instance will have self.selection == True.
-        self.singlecells[row][column].selection = True                  #Then assign the coordinates of this selected Single_Cell instance to self.selection.
+                self.singlecells[x][y].selection = False                #Reset all self.selection of Single_Cell instances in self.singlecells list to False. So that when a Single_Cell instance is
+                                                                        #selected again, only this Single_Cell instance will have self.selection == True, and it will be highlighted.
+        self.singlecells[row][column].selection = True                  #Then assign the coordinates of this selected Single_Cell instance to self.selection of Global_Grid.
         self.selection = (row, column)
 
     def clear_cell(self):                                               #Method enables an empty and unworked cell to remain clear of any number. If self.value is 0, it means cell is empty and should not display any number including 0.
@@ -117,14 +121,40 @@ class Global_Grid:                                                      #A Globa
         if self.singlecells[row][column].value == 0:                    #so that draw_single_cell method does not blit self.temporary_value = 0 onto the surface of the empty and unworked cell and it remains clear of any number.
             self.singlecells[row][column].insert_temporary_value(0)
 
-    def sketch_cell(self, value):                                       #Method allows user to sketch a draft number into an empty cell, by giving the cell a temporary value.
+    def sketch_cell(self, value):                                           #Method allows user to sketch a draft number into an empty cell, by giving the cell a temporary value.
         (row, column) = self.selection
         self.singlecells[row][column].insert_temporary_value(value)
 
-    def
+    def update_board(self):                                                                                      #Method updates the board with the cells that have been given a value. 
+        self.updatedgrid = [[self.singlecells[row][column].value for row in range(self.rows)] for column         #self.updatedgrid will be an array of Single_Cell instances that contains cells that have been updated with their inserted
+                            in range(self.columns)]                                                              #values, and all other Single_Cell instances that already have a value and are not empty.
+
+    def commit_value(self, value):                                          #Method commits a value to the selected cell, invokes update_board method to the board with the value, and then checks its validity and attempts to solve.
+        (row, column) = self.selection                                      #The coordinates of the current and selected cell that are assigned to self.selection (Global_Grid) will be unpacked.
+        if self.singlecells[row][column].value == 0:                        #If the coordinates of the cell lead to an empty cell, the method will insert a value to self.value of the Single_Cell instance. Then
+            self.singlecells[row][column].insert_value(value)               #it will invoke the update_board method to update the board with the selected cell and its new value; and then invoke the harmony function to check for the
+            self.update_board()                                             #validity of the inserted value, and attempt to solve the updated board to see if the inserted value is true for all global constraints of the sudoku board.
+            if harmony(self.updatedgrid, value, (row, column)) == True
+                    and solve_sudoku(self.updatedgrid) == True:
+                return True
+
+            else:                                                           #If the inserted value is not valid, and the updated board cannot be solved, reset self.value to 0 and
+                self.singlecells[row][column].insert_value(0)               #self.temporary_value to 0 so that the selected cell goes back to being empty (0) and clear of any numbers.
+                self.singlecells[row][column].insert_temporary_value(0)     #When commit_value returns True, it means we can commit the inserted value to the board because it meets all global constraints.
+                self.update_board()                                         #If it returns False, we cannot commit the value and cannot procced, thus we must reset the selected cell.
+                return False
+
+    def 
 
 
 
+
+    def check_complete(self):                                           #Method checks for all combinations of rows and columns, to check that all cells have been filled.
+        for row in range(self.rows):                                    #Returns False the moment an empty cell (value = 0) is encountered. Only returns True when all
+            for column in range(self.columns):                          #cell values != 0.
+                if self.singlecells[row][column].value == 0:
+                    return False
+        return True
 
 
 
