@@ -65,6 +65,7 @@ class Single_Cell:
 
 
 
+
 class Global_Grid:                                                      #A Global_Grid instance will hold all Single_Cell instances.
 
     sudoku_board = [                                                    #Adjust board manually if user wants to change the board/difficulty.
@@ -127,7 +128,7 @@ class Global_Grid:                                                      #A Globa
 
     def update_board(self):                                                                                      #Method updates the board with the cells that have been given a value. 
         self.updatedgrid = [[self.singlecells[row][column].value for row in range(self.rows)] for column         #self.updatedgrid will be an array of Single_Cell instances that contains cells that have been updated with their inserted
-                            in range(self.columns)]                                                              #values, and all other Single_Cell instances that already have a value and are not empty.
+                            in range(self.columns)]                                                              #values and all other Single_Cell instances that already have a value and are not empty.
 
     def commit_value(self, value):                                          #Method commits a value to the selected cell, invokes update_board method to the board with the value, and then checks its validity and attempts to solve.
         (row, column) = self.selection                                      #The coordinates of the current and selected cell that are assigned to self.selection (Global_Grid) will be unpacked.
@@ -153,23 +154,36 @@ class Global_Grid:                                                      #A Globa
         else:                                                               #If the position of the cursor is outside the boundary of the sudoku board,
             return None                                                     #return None since there is nothing beyond the boundary.
 
-    def check_complete(self):                                           #Method checks for all combinations of rows and columns, to check that all cells have been filled.
-        for row in range(self.rows):                                    #Returns False the moment an empty cell (value = 0) is encountered. Only returns True when all
-            for column in range(self.columns):                          #cell values != 0.
+    def check_complete(self):                                               #Method checks for all combinations of rows and columns, to check that all cells have been filled.
+        for row in range(self.rows):                                        #Returns False the moment an empty cell (value = 0) is encountered. Only returns True when all
+            for column in range(self.columns):                              #cell values != 0.
                 if self.singlecells[row][column].value == 0:
                     return False
         return True
 
-    def solve_sudoku_GUI(self):                                         #Method is simply the solve_sudoku function, but modified to display backtracking algorithm in real time.
-        emptycell_location = find_empty_cells(self.updatedgrid)         #Refer to sudoku_txtv1 for explanation of solve_sudoku function.
-        if emptycell_location is None:
+    def solve_sudoku_GUI(self):                                             #Method is simply the solve_sudoku function, but modified to display backtracking algorithm in real time.
+        emptycell_location = find_empty_cells(self.updatedgrid)             #Refer to sudoku_txtv1 for explanation of solve_sudoku function.
+        if emptycell_location is None:                                      #Once invoked, the method will keep running and solve the entire board. It starts at the most current empty cell.
             return True
         else:
             (row, column) = emptycell_location
-        for n in range(1, 10):
-            if harmony(self.updatedgrid, n, emptycell_location) == True:
-                ?
+        for n in range(1, 10):                                              #Since we are solving the entire board, we need to ensure both self.updatedgrid and self.singelcells have the correct number for every empty cell.
+            if harmony(self.updatedgrid, n, emptycell_location) == True:    #If n allows empty cell to be valid, change the value of that empty cell in self.updatedgrid to n, so that self.updatedgrid is valid for that cell.
+                self.updatedgrid[row][column] = n                           #Then, insert the same value of n into the same empty cell in self.singlecells, so that self.singlecells is also valid for that cell.
+                self.singlecells[row][column].insert_value(n)               #Note that self.singlecells contains an array of Single_Cell instances.
+                self.update_board()                                         #Call Update_board so that both self.singlecells and self.updated grid are synchronized with each other.
+                pygame.display.update()                                     #Updates portions of the screen for software displays, in this case, updates the current cell in real time and displays it.
+                pygame.time.delay(200)                                      #Pauses the program for an amount of time, in milliseconds.
 
+                if self.solve_sudoku_GUI() == True:                         #Same logic as solve_sudoku function, we invoke the method within the method to look at a new empty cell and attempt to solve the board
+                    return True                                             #with the newly inserted/updated value as a dependecy for the board to be valid. It it is still valid, returns True.
+
+                self.updatedgrid[row][column] = 0                           #If it is unable to remain valid, for n = 1-9, it will reset the previous empty cell to be 0 (empty) and then try again with another value of 
+                self.singlecells[row][column].insert_value(0)               #n, for n = 1-9. Because we are working with both self.updatedgrid and self.singlecells, we need to reset the same empty cell in both objects.
+                self.update_board()                                         #Call update_board so that both objects are synchronized with each other.
+                pygame.display.update()
+                pygame.time.delay(200)
+        return False
 
 
 
@@ -179,7 +193,7 @@ def main_window():
     #Construct a visible screen interface:
     screenwidth = 800
     screenheight = 920
-    screen = pygame.display.set_mode([screenwidth, screenheight])       #set_mode(size=(0, 0), flags=0, depth=0, display=0) -> set screen size.
+    screen = pygame.display.set_mode((screenwidth, screenheight))       #set_mode(size=(0, 0), flags=0, depth=0, display=0) -> set screen size.
     background = pygame.Surface(screen.get_size())                      #Surface((width, height), flags=0, depth=0, masks=None) -> create background surface. #get_size() -> (width, height)
     background.fill((0, 0, 0))                                          #fill(color, rect=None, special_flags=0) -> Rect color = (r, g, b)
     background.convert()                                                #change the pixel format of an image; convert(Surface=None) -> Surface
@@ -188,29 +202,29 @@ def main_window():
     
     mainloop = True                                                     #mainloop represents pygame window.
     #construct pygame events handler:
-#    while mainloop == True:                                             #If pygame window is still running:
-#        for event in pygame.event.get():                                #get events from the queue, get(eventtype=None) -> Event List
-#            if event.type == pygame.QUIT:                               #if event.type is a QUIT event, uninitialize all pygame modules, 
-#                mainloop = False                                        #pygame window closed by user.
-#            elif event.type == pygame.KEYDOWN:                          #else & if event.type is a KEYDOWN event, i.e, a key is pressed, set function of pressed keys, using pygame key constants.
-#                if event.key == pygame.K_1:                             #every KEYDOWN event has a key and a mod. Refer to pygame.key documentation for list of constants and their representations.
-#                    key = 1
-#                if event.key == pygame.K_2:
-#                    key = 2
-#                if event.key == pygame.K_3:
-#                    key = 3
-#                if event.key == pygame.K_4:
-#                    key = 4
-#                if event.key == pygame.K_5:
-#                    key = 5
-#                if event.key == pygame.K_6:
-#                    key = 6
-#                if event.key == pygame.K_7:
-#                    key = 7
-#                if event.key == pygame.K_8:
-#                    key = 8
-#                if event.key == pygame.K_9:
-#                    key = 9
+    while mainloop == True:                                             #If pygame window is still running:
+        for event in pygame.event.get():                                #get events from the queue, get(eventtype=None) -> Event List
+            if event.type == pygame.QUIT:                               #if event.type is a QUIT event, uninitialize all pygame modules, 
+                mainloop = False                                        #pygame window closed by user.
+            elif event.type == pygame.KEYDOWN:                          #else & if event.type is a KEYDOWN event, i.e, a key is pressed, set function of pressed keys, using pygame key constants.
+                if event.key == pygame.K_1:                             #every KEYDOWN event has a key and a mod. Refer to pygame.key documentation for list of constants and their representations.
+                    key = 1
+                if event.key == pygame.K_2:
+                    key = 2
+                if event.key == pygame.K_3:
+                    key = 3
+                if event.key == pygame.K_4:
+                    key = 4
+                if event.key == pygame.K_5:
+                    key = 5
+                if event.key == pygame.K_6:
+                    key = 6
+                if event.key == pygame.K_7:
+                    key = 7
+                if event.key == pygame.K_8:
+                    key = 8
+                if event.key == pygame.K_9:
+                    key = 9
                 #needs 2 more keys: enter(return) and delete (to reset all empty cells) - see pygame.key for documentation.
                 #needs event.type == pygame.MOUSEBUTTONDOWN - refer to pygame.mouse for documentation.
 
